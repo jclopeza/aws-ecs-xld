@@ -1,0 +1,33 @@
+---
+apiVersion: xl-deploy/v1
+kind: Applications
+spec:
+- name: Applications/apps/tutorial/1.0.0
+  type: udm.DeploymentPackage
+  deployables:
+  - name: tutorial-service
+    type: aws.ecs.ServiceSpec
+    taskPlacementTemplateName: AZ Balanced Spread
+    serviceName: tutorial-service
+    desiredCount: "1"
+    maximumPercent: "200"
+    minimumHealthyPercent: "50"
+    role: arn:aws:iam::390157638997:role/ecsServiceRole
+    containerDefinitions:
+    - name: tutorial
+      type: aws.ecs.ContainerDefinitionSpec
+      containerName: tutorial
+      image: lyhsoft/tutorial:113
+      hardMemoryLimit: "128"
+      portMappings:
+      - name: port-mappings-8080-1234
+        type: aws.ecs.PortSpec
+        hostPort: "8080"
+        containerPort: "1234"
+        protocol: tcp
+    loadBalancers:
+    - name: tutorial-elb
+      type: aws.ecs.LoadBalancerSpec
+      loadBalancerName: load-balancer-ecs
+      containerName: tutorial
+      containerPort: "1234"
